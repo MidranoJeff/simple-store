@@ -13,15 +13,17 @@ class ProductFactory extends Factory
 
     public function definition(): array
     {
-        $name = fake()->unique()->words(3, true);
+        // ALWAYS safely get category ID
+        $categoryId = Category::query()->inRandomOrder()->value('id');
 
         return [
-            'category_id' => Category::inRandomOrder()->first()?->id ?? Category::factory(),
-            'name' => ucfirst($name),
+            'category_id' => $categoryId ?? Category::factory(),
+
+            'name' => $name = $this->faker->unique()->words(3, true),
             'slug' => Str::slug($name),
-            'description' => fake()->paragraph(),
-            'price' => fake()->randomFloat(2, 10, 500),
-            'stock' => fake()->numberBetween(0, 100),
+            'description' => $this->faker->sentence(),
+            'price' => $this->faker->randomFloat(2, 500, 5000),
+            'stock' => $this->faker->numberBetween(1, 100),
             'image' => null,
         ];
     }

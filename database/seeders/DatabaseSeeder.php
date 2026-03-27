@@ -13,22 +13,22 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Admin first
+        // Admin
         $this->call(AdminSeeder::class);
 
-        // 2. Regular users
+        // Users (10 + admin = 11 total)
         User::factory(10)->create();
 
-        // 3. Categories
+        // Categories (5)
         Category::factory(5)->create();
 
-        // 4. Products
+        // Products (20) ✅ FIXED
         Product::factory(20)->create();
 
-        // 5. Orders
+        // Orders (10)
         Order::factory(10)->create();
 
-        // 6. Order items
+        // Order Items (30)
         OrderItem::factory(30)->create();
     }
 }
