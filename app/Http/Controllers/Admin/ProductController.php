@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
+    // LIST PRODUCTS
     public function index()
     {
         $products = Product::with('category')->paginate(10);
@@ -18,6 +19,7 @@ class ProductController extends Controller
         return view('admin.products.index', compact('products'));
     }
 
+    // SHOW CREATE FORM
     public function create()
     {
         $categories = Category::all();
@@ -25,6 +27,7 @@ class ProductController extends Controller
         return view('admin.products.create', compact('categories'));
     }
 
+    // STORE PRODUCT
     public function store(Request $request)
     {
         $request->validate([
@@ -49,11 +52,11 @@ class ProductController extends Controller
             'image' => $imagePath,
         ]);
 
-        return redirect()
-            ->route('admin.products.index')
+        return redirect()->route('admin.products.index')
             ->with('success', 'Product created successfully!');
     }
 
+    // SHOW EDIT FORM
     public function edit(Product $product)
     {
         $categories = Category::all();
@@ -61,6 +64,7 @@ class ProductController extends Controller
         return view('admin.products.edit', compact('product', 'categories'));
     }
 
+    // UPDATE PRODUCT
     public function update(Request $request, Product $product)
     {
         $request->validate([
@@ -71,10 +75,8 @@ class ProductController extends Controller
             'image' => 'nullable|image|max:2048',
         ]);
 
-        // Handle image update
         if ($request->hasFile('image')) {
 
-            // Delete old image
             if ($product->image && Storage::disk('public')->exists($product->image)) {
                 Storage::disk('public')->delete($product->image);
             }
@@ -95,22 +97,20 @@ class ProductController extends Controller
             'image' => $imagePath,
         ]);
 
-        return redirect()
-            ->route('admin.products.index')
+        return redirect()->route('admin.products.index')
             ->with('success', 'Product updated successfully!');
     }
 
+    // DELETE PRODUCT
     public function destroy(Product $product)
     {
-        // Delete image if exists
         if ($product->image && Storage::disk('public')->exists($product->image)) {
             Storage::disk('public')->delete($product->image);
         }
 
         $product->delete();
 
-        return redirect()
-            ->route('admin.products.index')
+        return redirect()->route('admin.products.index')
             ->with('success', 'Product deleted successfully!');
     }
 }

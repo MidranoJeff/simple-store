@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('title', 'Products')
 
@@ -40,7 +40,9 @@
                         <td class="p-3 border">{{ $product->id }}</td>
                         <td class="p-3 border">{{ $product->name }}</td>
                         <td class="p-3 border">{{ $product->category->name ?? 'N/A' }}</td>
-                        <td class="p-3 border">{{ $product->price }}</td>
+                        <td class="p-3 border">
+                            ₱{{ number_format($product->price, 2) }}
+                        </td>
                         <td class="p-3 border">
                             <a href="{{ route('admin.products.edit', $product->id) }}"
                                class="text-blue-600 hover:underline">
