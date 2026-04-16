@@ -4,48 +4,60 @@
 
 @section('content')
 
-<div class="bg-white p-6 rounded shadow">
+<div class="space-y-6">
 
-    <div class="flex justify-between items-center mb-4">
-        <h1 class="text-2xl font-bold">Categories</h1>
+    <!-- ADD CATEGORY FORM -->
+    <div class="bg-white p-6 rounded-xl shadow">
+        <h2 class="text-lg font-semibold mb-4">Add Category</h2>
 
-        <a href="{{ route('admin.categories.create') }}"
-           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            + Add Category
-        </a>
+        <form action="{{ route('admin.categories.store') }}" method="POST">
+            @csrf
+
+            <div class="flex gap-3">
+                <input type="text" name="name"
+                    placeholder="Category name"
+                    class="border p-2 rounded w-full"
+                    required>
+
+                <button type="submit"
+                    class="bg-blue-600 text-white px-4 py-2 rounded">
+                    Add
+                </button>
+            </div>
+        </form>
     </div>
 
-    <table class="w-full border">
-        <thead class="bg-gray-200">
-            <tr>
-                <th class="p-2 border">ID</th>
-                <th class="p-2 border">Name</th>
-                <th class="p-2 border">Products</th>
-                <th class="p-2 border">Actions</th>
-            </tr>
-        </thead>
+    <!-- CATEGORY TABLE -->
+    <div class="bg-white p-6 rounded-xl shadow">
 
-        <tbody>
-            @forelse($categories as $category)
-                <tr class="text-center">
-                    <td class="p-2 border">{{ $category->id }}</td>
-                    <td class="p-2 border">{{ $category->name }}</td>
-                    <td class="p-2 border">{{ $category->products_count }}</td>
-                    <td class="p-2 border">
-                        <a href="#"
-                           class="text-blue-600 hover:underline">Edit</a>
-                    </td>
+        <table class="w-full text-left">
+            <thead>
+                <tr class="border-b">
+                    <th class="py-2">ID</th>
+                    <th class="py-2">Name</th>
+                    <th class="py-2">Created</th>
                 </tr>
-            @empty
-                <tr>
-                    <td colspan="4" class="p-4 text-gray-500">
-                        No categories found
-                    </td>
-                </tr>
-            @endforelse
-        </tbody>
+            </thead>
 
-    </table>
+            <tbody>
+                @forelse($categories as $category)
+                    <tr class="border-b">
+                        <td class="py-2">{{ $category->id }}</td>
+                        <td>{{ $category->name }}</td>
+                        <td>{{ $category->created_at->format('Y-m-d') }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" class="text-center py-4 text-gray-500">
+                            No categories found
+                        </td>
+                    </tr>
+                @endforelse
+            </tbody>
+
+        </table>
+
+    </div>
 
 </div>
 

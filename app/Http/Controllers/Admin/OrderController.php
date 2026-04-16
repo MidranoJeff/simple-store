@@ -14,16 +14,15 @@ class OrderController extends Controller
             ->latest()
             ->paginate(15);
 
-        return view('orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders'));
     }
 
-    public function show(Order $order)
-    {
-        $order->load('orderItems.product', 'user');
+   public function show(Order $order)
+{
+    $order->load('orderItems.product', 'user');
 
-        return view('orders.show', compact('order'));
-    }
-
+    return view('admin.orders.show', compact('order'));
+}
     public function update(Request $request, Order $order)
     {
         $request->validate([

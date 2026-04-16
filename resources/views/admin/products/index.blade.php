@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('title', 'Products')
 
@@ -37,18 +37,48 @@
             <tbody>
                 @forelse($products as $product)
                     <tr class="border-t">
+
                         <td class="p-3 border">{{ $product->id }}</td>
+
                         <td class="p-3 border">{{ $product->name }}</td>
-                        <td class="p-3 border">{{ $product->category->name ?? 'N/A' }}</td>
+
+                        <td class="p-3 border">
+                            {{ $product->category->name ?? 'N/A' }}
+                        </td>
+
                         <td class="p-3 border">
                             ₱{{ number_format($product->price, 2) }}
                         </td>
+
                         <td class="p-3 border">
+
                             <a href="{{ route('admin.products.edit', $product->id) }}"
                                class="text-blue-600 hover:underline">
                                 Edit
                             </a>
+
+                            <!-- ADD TO CART (FIXED FORM) -->
+                            <form action="{{ route('cart.add', $product->id) }}"
+                                  method="POST"
+                                  class="mt-2">
+
+                                @csrf
+
+                                <input type="number"
+                                       name="quantity"
+                                       value="1"
+                                       min="1"
+                                       class="border p-1 w-16">
+
+                                <button type="submit"
+                                        class="bg-green-600 text-white px-2 py-1 text-sm rounded">
+                                    Add to Cart
+                                </button>
+
+                            </form>
+
                         </td>
+
                     </tr>
                 @empty
                     <tr>

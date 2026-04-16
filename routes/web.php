@@ -1,30 +1,25 @@
 <?php
 
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 
-/*
-|--------------------------------------------------------------------------
-| HOME REDIRECT
-|--------------------------------------------------------------------------
-*/
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 
-Route::get('/', function () {
-    return redirect('/admin/dashboard');
-});
 
 /*
 |--------------------------------------------------------------------------
-| PUBLIC PRODUCT ROUTES (NO LOGIN)
+| PUBLIC ROUTES (NO LOGIN REQUIRED)
 |--------------------------------------------------------------------------
 */
+
+Route::get('/', fn () => view('welcome'));
 
 Route::get('/products', [ProductController::class, 'index'])
     ->name('products.index');
@@ -34,23 +29,39 @@ Route::get('/products/{product}', [ProductController::class, 'show'])
 
 /*
 |--------------------------------------------------------------------------
-| CUSTOMER ROUTES (AUTH REQUIRED)
+| AUTH ROUTES (CUSTOMER ONLY)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth'])->group(function () {
 
-    // Cart
+    // CART
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
-    Route::patch('/cart/update/{productId}', [CartController::class, 'update'])->name('cart.update');
-    Route::delete('/cart/remove/{productId}', [CartController::class, 'remove'])->name('cart.remove');
+    Route::patch('/cart/update/{product}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/cart/remove/{product}', [CartController::class, 'remove'])->name('cart.remove');
     Route::delete('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 
-    // Orders (Customer)
-    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    // CHECKOUT
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/success/{order}', [CheckoutController::class, 'success'])->name('checkout.success');
+
+    // PROFILE
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/dashboard', fn () => view('dashboard'))
+    ->middleware(['auth', 'verified'])
+    ->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------
@@ -63,17 +74,13 @@ Route::middleware(['auth', 'admin'])
     ->name('admin.')
     ->group(function () {
 
-        // Dashboard
         Route::get('/dashboard', [DashboardController::class, 'index'])
             ->name('dashboard');
 
-        // Categories
         Route::resource('categories', CategoryController::class);
 
-        // Products
         Route::resource('products', AdminProductController::class);
 
-        // Orders (Admin)
         Route::get('/orders', [AdminOrderController::class, 'index'])
             ->name('orders.index');
 
@@ -82,11 +89,6 @@ Route::middleware(['auth', 'admin'])
 
         Route::patch('/orders/{order}', [AdminOrderController::class, 'update'])
             ->name('orders.update');
-
-        // Test route
-        Route::get('/test', function () {
-            return 'Laravel is working ✅';
-        });
     });
 
 require __DIR__.'/auth.php';

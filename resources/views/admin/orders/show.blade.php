@@ -10,9 +10,9 @@
 
 <hr class="my-4">
 
-<form method="POST" action="{{ route('admin.orders.update', $order) }}">
+<form method="POST" action="/admin/orders/{{ $order->id }}">
     @csrf
-    @method('PUT')
+    <input type="hidden" name="_method" value="PATCH">
 
     <select name="status" class="border p-2">
         <option value="pending">Pending</option>
@@ -22,7 +22,7 @@
         <option value="cancelled">Cancelled</option>
     </select>
 
-    <button class="bg-blue-600 text-white px-4 py-2 rounded ml-2">
+    <button type="submit">
         Update
     </button>
 </form>
