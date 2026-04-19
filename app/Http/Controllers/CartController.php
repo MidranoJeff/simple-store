@@ -17,40 +17,41 @@ class CartController extends Controller
     }
 
     // Add to cart
-  public function add(Request $request, Product $product)
-{
-    $request->validate([
-        'quantity' => 'required|integer|min:1',
-    ]);
+    public function add(Request $request, Product $product)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
 
-    // 🔥 DEBUG (TEMPORARY - REMOVE AFTER TEST)
-    // dd('ADD WORKS', $product->id, $request->quantity);
+        $cart = session()->get('cart', []);
 
-    $cart = session()->get('cart', []);
+        $quantity = (int) $request->quantity;
 
-    $quantity = (int) $request->quantity;
+        // If product already in cart, add quantity
+        if (isset($cart[$product->id])) {
+            $quantity += $cart[$product->id]['quantity'];
+        }
 
-    if (isset($cart[$product->id])) {
-        $quantity += $cart[$product->id]['quantity'];
+        // Check stock
+        if ($quantity > $product->stock) {
+            return back()->with('error', 'Not enough stock available!');
+        }
+
+        // Save/update cart item
+        $cart[$product->id] = [
+            'name' => $product->name,
+            'price' => $product->price,
+            'quantity' => $quantity,
+            'subtotal' => $product->price * $quantity,
+        ];
+
+        // Save to session (FIXED)
+        session()->put('cart', $cart);
+
+        return redirect('/cart')->with('success', 'Added to cart!');
     }
 
-    if ($quantity > $product->stock) {
-        return back()->with('error', 'Not enough stock available!');
-    }
-
-    $cart[$product->id] = [
-        'name' => $product->name,
-        'price' => $product->price,
-        'quantity' => $quantity,
-        'subtotal' => $product->price * $quantity,
-    ];
-
-    session(['cart' => $cart]); // 🔥 IMPORTANT (use this instead of put)
-
-    return redirect('/cart')->with('success', 'Added to cart!');
-}
-
-    // Update cart
+    // Update cart quantity
     public function update(Request $request, $productId)
     {
         $request->validate([
@@ -67,10 +68,10 @@ class CartController extends Controller
             session()->put('cart', $cart);
         }
 
-        return back();
+        return back()->with('success', 'Cart updated!');
     }
 
-    // Remove item
+    // Remove item from cart
     public function remove($productId)
     {
         $cart = session()->get('cart', []);
@@ -79,14 +80,14 @@ class CartController extends Controller
 
         session()->put('cart', $cart);
 
-        return back();
+        return back()->with('success', 'Item removed from cart!');
     }
 
-    // Clear cart
+    // Clear entire cart
     public function clear()
     {
         session()->forget('cart');
 
-        return back();
+        return back()->with('success', 'Cart cleared!');
     }
 }

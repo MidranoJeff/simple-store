@@ -9,7 +9,8 @@
     <div class="flex justify-between items-center">
         <h1 class="text-2xl font-bold text-gray-800">Products</h1>
 
-        <a href="#" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
+        <a href="{{ route('admin.products.create') }}"
+           class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">
             + Add Product
         </a>
     </div>
@@ -27,25 +28,35 @@
             </thead>
 
             <tbody>
-                <tr class="border-b">
-                    <td class="py-2">T-Shirt</td>
-                    <td>₱500</td>
-                    <td>20</td>
-                    <td>
-                        <button class="text-blue-600">Edit</button>
-                        <button class="text-red-600 ml-2">Delete</button>
-                    </td>
-                </tr>
+                @forelse ($products as $product)
+                    <tr class="border-b">
+                        <td class="py-2">{{ $product->name }}</td>
+                        <td>₱{{ number_format($product->price, 2) }}</td>
+                        <td>{{ $product->stock }}</td>
+                        <td>
+                            <a href="{{ route('admin.products.edit', $product) }}"
+                               class="text-blue-600">Edit</a>
 
-                <tr class="border-b">
-                    <td class="py-2">Shoes</td>
-                    <td>₱1,500</td>
-                    <td>10</td>
-                    <td>
-                        <button class="text-blue-600">Edit</button>
-                        <button class="text-red-600 ml-2">Delete</button>
-                    </td>
-                </tr>
+                            <form action="{{ route('admin.products.destroy', $product) }}"
+                                  method="POST"
+                                  class="inline">
+                                @csrf
+                                @method('DELETE')
+
+                                <button class="text-red-600 ml-2"
+                                        onclick="return confirm('Delete this product?')">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" class="py-4 text-center text-gray-500">
+                            No products found.
+                        </td>
+                    </tr>
+                @endforelse
             </tbody>
 
         </table>

@@ -7,12 +7,14 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderPlaced;
 
 class CheckoutController extends Controller
 {
     public function index()
     {
-        $cart = session()->get('cart', []);
+        $cart = session('cart', []);
 
         if (empty($cart)) {
             return redirect()->route('cart.index')
@@ -26,7 +28,7 @@ class CheckoutController extends Controller
 
     public function store(Request $request)
     {
-        $cart = session()->get('cart', []);
+        $cart = session('cart', []);
 
         if (empty($cart)) {
             return redirect()->route('cart.index')
@@ -42,6 +44,7 @@ class CheckoutController extends Controller
 
         $total = array_sum(array_column($cart, 'subtotal'));
 
+        // CREATE ORDER
         $order = Order::create([
             'user_id' => Auth::id(),
             'name' => $request->name,
@@ -52,7 +55,9 @@ class CheckoutController extends Controller
             'status' => 'pending',
         ]);
 
+        // SAVE ORDER ITEMS
         foreach ($cart as $productId => $item) {
+
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $productId,
@@ -61,15 +66,20 @@ class CheckoutController extends Controller
             ]);
 
             $product = Product::find($productId);
+
             if ($product) {
                 $product->decrement('stock', $item['quantity']);
             }
         }
 
+        // CLEAR CART
         session()->forget('cart');
 
-        return redirect()->route('checkout.success', $order->id)
-            ->with('success', 'Order placed successfully!');
+        // SEND EMAIL
+        Mail::to($order->email)->queue(new OrderPlaced($order));
+
+        // ✅ FINAL FIX: GO TO SUCCESS PAGE
+        return redirect()->route('payment.pay', $order->id);
     }
 
     public function success(Order $order)

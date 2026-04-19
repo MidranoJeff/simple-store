@@ -19,12 +19,13 @@ return new class extends Migration
         $table->string('phone');
         $table->text('address');
         $table->decimal('total_amount', 10, 2);
-        $table->enum('status', [
-            'pending',
-            'processing',
-            'shipped',
-            'delivered',
-            'cancelled'
+  $table->enum('status', [
+    'pending',
+    'processing',
+    'shipped',
+    'delivered',
+    'cancelled'
+
         ])->default('pending');
         $table->string('invoice_url')->nullable();
         $table->timestamps();

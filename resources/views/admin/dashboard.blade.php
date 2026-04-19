@@ -8,14 +8,14 @@
 <div class="row mb-4">
 
     <div class="col-md-3">
-        <div class="card bg-primary text-white p-3">
+        <div class="card bg-primary text-green p-3">
             <h5>Total Orders</h5>
             <h3>{{ $totalOrders }}</h3>
         </div>
     </div>
 
     <div class="col-md-3">
-        <div class="card bg-success text-white p-3">
+        <div class="card bg-success text-green p-3">
             <h5>Total Products</h5>
             <h3>{{ $totalProducts }}</h3>
         </div>
@@ -29,7 +29,7 @@
     </div>
 
     <div class="col-md-3">
-        <div class="card bg-info text-white p-3">
+        <div class="card bg-info text-pink p-3">
             <h5>Total Categories</h5>
             <h3>{{ $totalCategories }}</h3>
         </div>
